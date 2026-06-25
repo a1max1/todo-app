@@ -4,6 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Todo App</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css" />
     <script src="script.js" defer></script>
   </head>
@@ -17,7 +20,7 @@
             Dark mode
           </button>
         </div>
-        <p class="subtitle">Add tasks, track them, and remove them when they’re done.</p>
+        <p class="subtitle">Add tasks, track them, and remove them when they're done.</p>
 
         <form class="todo-form" id="todo-form">
           <label class="sr-only" for="todo-input">Add a new todo</label>
@@ -30,6 +33,13 @@
           />
           <button type="submit">Add Todo</button>
         </form>
+
+        <div class="todo-stats" id="todo-stats" aria-live="polite" aria-atomic="true" hidden>
+          <span id="todo-stats-text"></span>
+          <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+            <div class="progress-fill" id="progress-fill"></div>
+          </div>
+        </div>
 
         <ul class="todo-list" id="todo-list" aria-live="polite" aria-relevant="additions removals"></ul>
       </section>
