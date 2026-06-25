@@ -1,6 +1,36 @@
 const form = document.getElementById('todo-form');
 const input = document.getElementById('todo-input');
 const list = document.getElementById('todo-list');
+const themeToggle = document.getElementById('theme-toggle');
+const THEME_STORAGE_KEY = 'todo-theme';
+
+const isTheme = (value) => value === 'light' || value === 'dark';
+
+const getPreferredTheme = () => {
+  const storedTheme = localStorage.getItem(THEME_STORAGE_KEY);
+  if (isTheme(storedTheme)) {
+    return storedTheme;
+  }
+
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+};
+
+const applyTheme = (theme) => {
+  document.documentElement.dataset.theme = theme;
+  document.documentElement.style.colorScheme = theme;
+
+  const nextTheme = theme === 'dark' ? 'light' : 'dark';
+  themeToggle.textContent = theme === 'dark' ? 'Light mode' : 'Dark mode';
+  themeToggle.setAttribute('aria-label', `Switch to ${nextTheme} mode`);
+};
+
+const toggleTheme = () => {
+  const currentTheme = document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light';
+  const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+  applyTheme(nextTheme);
+  localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
+};
 
 const renderEmptyState = () => {
   list.innerHTML = '';
@@ -58,5 +88,8 @@ form.addEventListener('submit', (event) => {
   form.reset();
   input.focus();
 });
+
+themeToggle.addEventListener('click', toggleTheme);
+applyTheme(getPreferredTheme());
 
 renderEmptyState();
