@@ -2,6 +2,9 @@ const form = document.getElementById('todo-form');
 const input = document.getElementById('todo-input');
 const list = document.getElementById('todo-list');
 const themeToggle = document.getElementById('theme-toggle');
+const todoStats = document.getElementById('todo-stats');
+const todoStatsText = document.getElementById('todo-stats-text');
+const progressFill = document.getElementById('progress-fill');
 const THEME_STORAGE_KEY = 'todo-theme';
 
 const isTheme = (value) => value === 'light' || value === 'dark';
@@ -32,8 +35,30 @@ const toggleTheme = () => {
   localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
 };
 
+const updateStats = () => {
+  const items = list.querySelectorAll('.todo-item');
+  const total = items.length;
+
+  if (total === 0) {
+    todoStats.hidden = true;
+    return;
+  }
+
+  const completed = list.querySelectorAll('.todo-item.completed').length;
+  const percent = Math.round((completed / total) * 100);
+
+  todoStats.hidden = false;
+  todoStatsText.textContent = completed === total
+    ? `All ${total} task${total !== 1 ? 's' : ''} completed 🎉`
+    : `${completed} of ${total} task${total !== 1 ? 's' : ''} completed`;
+
+  progressFill.style.width = `${percent}%`;
+  progressFill.closest('[role="progressbar"]').setAttribute('aria-valuenow', percent);
+};
+
 const renderEmptyState = () => {
   list.innerHTML = '';
+  todoStats.hidden = true;
 
   const emptyState = document.createElement('li');
   emptyState.className = 'empty-state';
@@ -50,6 +75,7 @@ const createTodoItem = (todoText) => {
   checkbox.className = 'todo-checkbox';
   checkbox.addEventListener('change', () => {
     item.classList.toggle('completed', checkbox.checked);
+    updateStats();
   });
 
   const text = document.createElement('span');
@@ -59,11 +85,16 @@ const createTodoItem = (todoText) => {
   removeButton.type = 'button';
   removeButton.textContent = 'Delete';
   removeButton.addEventListener('click', () => {
-    item.remove();
+    item.classList.add('removing');
+    item.addEventListener('animationend', () => {
+      item.remove();
 
-    if (!list.querySelector('.todo-item')) {
-      renderEmptyState();
-    }
+      if (!list.querySelector('.todo-item')) {
+        renderEmptyState();
+      } else {
+        updateStats();
+      }
+    }, { once: true });
   });
 
   item.append(checkbox, text, removeButton);
@@ -85,6 +116,7 @@ form.addEventListener('submit', (event) => {
   }
 
   list.appendChild(createTodoItem(todoText));
+  updateStats();
   form.reset();
   input.focus();
 });
